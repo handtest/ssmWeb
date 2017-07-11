@@ -31,15 +31,15 @@
     <caption>悬停表格布局</caption>
     <thead>
     <tr>
-        <th>名称</th>
+        <th>姓名</th>
+        <th>年龄</th>
         <th>城市</th>
-        <th>邮编</th>
         <th>操作</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach items="${userList}" var="user" varStatus="status" >
-        <form action="<%=request.getContextPath()%>/edit" method="get" id="${user.id}">
+        <form action="<%=request.getContextPath()%>/edit" method="post" id="${user.id}">
         <tr>
             <td><span id="${user.id}name">${user.userName}</span><input id="${user.id}inName" style="display: none;" type="text" name="userName" value="${user.userName}" /></td>
             <td><span id="${user.id}age">${user.age}</span><input id="${user.id}inAge" style="display: none" type="text" name="age"  value="${user.age}" /></td>
@@ -53,7 +53,7 @@
         </tr>
         </form>
     </c:forEach>
-    <form action="<%=request.getContextPath()%>/save" id="addUserId" method="get" name="addUserFrom">
+    <form action="<%=request.getContextPath()%>/save" id="addUserId" method="post" name="addUserFrom">
         <tr>
             <td><input type="text" name="userName"   /></td>
             <td><input type="text" name="age"   /></td>

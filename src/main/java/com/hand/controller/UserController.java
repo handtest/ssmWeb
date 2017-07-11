@@ -53,13 +53,16 @@ public class UserController {
     public void save(HttpServletRequest request, HttpServletResponse response) {
         try {
             String name = request.getParameter("userName");
-            int age = Integer.parseInt(request.getParameter("age"));
+            String age = request.getParameter("age");
             String address = request.getParameter("address");
-            User user = new User();
-            user.setUserName(name);
-            user.setAge(age);
-            user.setAddress(address);
-            userService.save(user);
+            if (name != null && name != "" && age != null && age != "" && address != null && address != ""){
+                User user = new User();
+                user.setUserName(name);
+                user.setAge(Integer.parseInt(age));
+                user.setAddress(address);
+                userService.save(user);
+            }
+
             RequestDispatcher dispatcher = request.getRequestDispatcher("/showUser");
             dispatcher.forward(request,response);
         } catch (ServletException e) {
@@ -106,8 +109,10 @@ public class UserController {
     @RequestMapping("/remove")
     public void remove(HttpServletRequest request, HttpServletResponse response, Model model){
         try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            userService.remove(id);
+            String id = request.getParameter("id");
+            if (id != null && id != ""){
+                userService.remove(Integer.parseInt(id));
+            }
             RequestDispatcher dispatcher = request.getRequestDispatcher("/showUser");
             dispatcher.forward(request,response);
         } catch (ServletException e) {
@@ -124,11 +129,14 @@ public class UserController {
             return "index";
         }
         String name = request.getParameter("userName");
-        User user = userService.checkLogin(name);
-        if (user != null) {
-            List<User> userList = userService.listUser();
-            model.addAttribute("userList",userList);
-            return "showUser";
+        if (name!=null && name != ""){
+            User user = userService.checkLogin(name);
+            if (user != null) {
+                request.getSession().setAttribute("username",name);
+                List<User> userList = userService.listUser();
+                model.addAttribute("userList",userList);
+                return "showUser";
+            }
         }
         model.addAttribute("msg","找不到用户！");
         return "index";
@@ -138,6 +146,9 @@ public class UserController {
         HttpSession session = request.getSession();
         String sessionCode = (String)session.getAttribute("randCheckCode");
         String checkCode = request.getParameter("checkCode");
+        if (sessionCode == null){
+            return false;
+        }
         if (sessionCode.equals(checkCode)){
             return true;
         }
