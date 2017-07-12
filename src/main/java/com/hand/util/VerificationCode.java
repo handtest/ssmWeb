@@ -135,6 +135,7 @@ public class VerificationCode extends HttpServlet {
             g.drawString(ctmp, 15*i+18, 14);
         }
         System.out.println(sRand);
+
         HttpSession session = request.getSession();
         session.setAttribute("randCheckCode", sRand);
         g.dispose();    //释放g所占用的系统资源

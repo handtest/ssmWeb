@@ -149,7 +149,8 @@ public class UserController {
         if (sessionCode == null){
             return false;
         }
-        if (sessionCode.equals(checkCode)){
+        int equalsInt = sessionCode.compareToIgnoreCase(checkCode);
+        if (equalsInt==0){
             return true;
         }
         return false;

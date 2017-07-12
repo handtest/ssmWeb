@@ -1,0 +1,151 @@
+;(function($, window, document, undefined) {
+
+    var defaults = {
+        url : null,
+        data : null
+    };
+
+    var iatemplate = {
+
+        projectTemplate : '<tr><td  class="prj_name">##project_name##</td></tr>'+
+        '<tr><td>flyback情况：##flyback_count##</td>'+
+        '<td>项目经理：##pm_name##</td>'+
+        '<td>角色：##role_name##</td></tr>'+
+        '<tr><td>已填写外部计费人天：##external_days##</td>'+
+        '<td>已填写全部人天：##all_days##</td>'+
+        '<td>项目周期：##date_from## - ##date_to##</td></tr>'
+
+    };
+
+    _renderProjectData = function(projectData,index){
+        if(projectData){
+            var prjTemplateData = iatemplate.projectTemplate;
+            prjTemplateData = prjTemplateData.replace(/##project_name##/, projectData.project_name);
+            prjTemplateData = prjTemplateData.replace(/##flyback_count##/, projectData.flyback_count);
+            prjTemplateData = prjTemplateData.replace(/##pm_name##/, projectData.pm_name);
+            prjTemplateData = prjTemplateData.replace(/##role_name##/, projectData.role_name);
+            prjTemplateData = prjTemplateData.replace(/##external_days##/, projectData.external_days);
+            prjTemplateData = prjTemplateData.replace(/##all_days##/, projectData.all_days);
+            prjTemplateData = prjTemplateData.replace(/##date_from##/, projectData.date_from);
+            prjTemplateData = prjTemplateData.replace(/##date_to##/, projectData.date_to);
+            return prjTemplateData;
+        }
+        return null;
+    };
+    _loadParticipationProjectData = function($container, myProjects, ajaxOption){
+        $.ajax({
+            type: "GET",
+            url: ajaxOption.url,
+            dataType:'jsonp',
+            jsonp:'callback',
+            jsonpCallback:"successCallback",
+            success: function(msg){
+                for(var i=0;i<ajaxOption.data.pageSize;i++){
+                    var prjTemplate = _renderProjectData(msg[i]);
+                    if(i < ajaxOption.data.pageSize-1){
+                        prjTemplate += iatemplate.hrTemplate ;
+                    }
+                    $container.append(prjTemplate);
+                }
+            }
+        });
+    };
+
+
+    var methods = {
+        init : function(options) {
+
+            if (this && this.length > 1) {
+                throw 'Container Element Must Be Unique!';
+            }
+
+            return this.each(function() {
+                var $this = $(this), $container = $this;
+
+                var plugin = {
+                    '$container' : $container,
+                    'settings' : null,
+                    'myProjects' : []
+                };
+
+                plugin.settings = plugin.$container.data('weatherProject');
+
+                plugin.settings = $.extend({}, defaults, options);
+
+                var ajaxOption = {
+                    'url' : options.url,
+                    'data' : options.data
+                }
+
+                if (!ajaxOption.url) {
+                    throw 'url can not be null!';
+                }
+                $container.html('');
+                plugin.$container.data('weatherProject', plugin);
+
+            });
+        },
+
+        participationProject : function(options) {
+
+            if (this && this.length > 1) {
+                throw 'Container Element Must Be Unique!';
+            }
+
+            return this.each(function() {
+                var $this = $(this), $container = $this;
+
+                var plugin = {
+                    '$container' : $container,
+                    'settings' : null,
+                    'myProjects' : []
+                };
+
+                plugin.settings = plugin.$container.data('weatherProject');
+
+                plugin.settings = $.extend({}, defaults, options);
+
+                var ajaxOption = {
+                    'url' : options.url,
+                    'data' : options.data
+                }
+
+                if (!ajaxOption.url) {
+                    throw 'url can not be null!';
+                }
+                $container.html('');
+                _loadParticipationProjectData($container, plugin.myProjects,ajaxOption);
+                plugin.$container.data('weatherProject', plugin);
+
+            });
+        },
+
+
+        destroy : function(options) {
+            return $(this).each(function() {
+                var $this = $(this);
+                $this.removeData('weatherProject');
+            });
+        }
+    };
+
+
+    $.fn.MyWeatherProject = function(option) {
+
+        var method = arguments[0];
+
+        if (methods[method]) {
+            method = methods[method];
+            arguments = Array.prototype.slice.call(arguments, 1);
+        } else if (typeof (method) == 'object' || !method) {
+            method = methods.init;
+        } else {
+            $.error('Method ' + method
+                + ' does not exist on jQuery.weatherProject');
+            return this;
+        }
+
+        return method.apply(this, arguments);
+
+    };
+})(jQuery, window, document);
