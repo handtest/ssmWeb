@@ -40,7 +40,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
         //获取Session
         HttpSession session = request.getSession();
-        String username = (String)session.getAttribute("username");
+        String username = (String)session.getAttribute("name");
 
         if(username != null){
             return true;

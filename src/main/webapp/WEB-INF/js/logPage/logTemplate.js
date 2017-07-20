@@ -1,3 +1,7 @@
+/**
+ * Created by hanlu on 2017/7/19.
+ */
+
 ;(function($, window, document, undefined) {
 
     var defaults = {
@@ -5,48 +9,49 @@
         data : null
     };
 
-    var iatemplate = {
+    var logTemplate = {
 
-        projectTemplate : '<tr><td  class="prj_name">##project_name##</td></tr>'+
-        '<tr><td>flyback情况：##flyback_count##</td>'+
-        '<td>项目经理：##pm_name##</td>'+
-        '<td>角色：##role_name##</td></tr>'+
-        '<tr><td>已填写外部计费人天：##external_days##</td>'+
-        '<td>已填写全部人天：##all_days##</td>'+
-        '<td>项目周期：##date_from## - ##date_to##</td></tr>'
+        listLogTemplate :   '<tr>'
+                              + '<td>##operationUserId##</td>'
+                              + '<td>##operationUsername##</td>'
+                              + '<td>##operationAddress##</td>'
+                              + '<td>##operationParam##</td>'
+                              + '<td>##operationDescription##</td>'
+                              + '<td>##operationIp##</td>'
+                              + '<td><fmt:formatDate value="##operationDate##" pattern="yyyy-MM-dd HH:mm:ss"/></td>'
+                              + '</tr>',
+        pagingTemplate : '<li><a href="#" ></a></li>'
 
     };
 
     _renderProjectData = function(projectData,index){
         if(projectData){
-            var prjTemplateData = iatemplate.projectTemplate;
-            prjTemplateData = prjTemplateData.replace(/##project_name##/, projectData.project_name);
-            prjTemplateData = prjTemplateData.replace(/##flyback_count##/, projectData.flyback_count);
-            prjTemplateData = prjTemplateData.replace(/##pm_name##/, projectData.pm_name);
-            prjTemplateData = prjTemplateData.replace(/##role_name##/, projectData.role_name);
-            prjTemplateData = prjTemplateData.replace(/##external_days##/, projectData.external_days);
-            prjTemplateData = prjTemplateData.replace(/##all_days##/, projectData.all_days);
-            prjTemplateData = prjTemplateData.replace(/##date_from##/, projectData.date_from);
-            prjTemplateData = prjTemplateData.replace(/##date_to##/, projectData.date_to);
+            var prjTemplateData = logTemplate.listLogTemplate;
+            prjTemplateData = prjTemplateData.replace(/##operationUserId##/, projectData.operationUserId);
+            prjTemplateData = prjTemplateData.replace(/##operationUsername##/, projectData.operationUsername);
+            prjTemplateData = prjTemplateData.replace(/##operationAddress##/, projectData.operationAddress);
+            prjTemplateData = prjTemplateData.replace(/##operationParam##/, projectData.operationParam);
+            prjTemplateData = prjTemplateData.replace(/##operationDescription##/, projectData.operationDescription);
+            prjTemplateData = prjTemplateData.replace(/##operationIp##/, projectData.operationIp);
+            prjTemplateData = prjTemplateData.replace(/##operationDate##/, projectData.operationDate);
             return prjTemplateData;
         }
         return null;
     };
-    _loadParticipationProjectData = function($container, myProjects, ajaxOption){
+    _loadLogProjectData = function($container, myProjects, ajaxOption){
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: ajaxOption.url,
+            data:ajaxOption.data,
             dataType:'jsonp',
             jsonp:'callback',
             jsonpCallback:"successCallback",
             success: function(msg){
-                for(var i=0;i<ajaxOption.data.pageSize;i++){
-                    var prjTemplate = _renderProjectData(msg[i]);
-                    if(i < ajaxOption.data.pageSize-1){
-                        prjTemplate += iatemplate.hrTemplate ;
-                    }
-                    $container.append(prjTemplate);
+                var prjTemplate = "";
+                for(var i=0;i<msg.length;i++){
+                    prjTemplate += _renderProjectData(msg[i]);
                 }
+                $container.append(prjTemplate);
             }
         });
     };
@@ -68,7 +73,7 @@
                     'myProjects' : []
                 };
 
-                plugin.settings = plugin.$container.data('weatherProject');
+                plugin.settings = plugin.$container.data('logProject');
 
                 plugin.settings = $.extend({}, defaults, options);
 
@@ -81,12 +86,12 @@
                     throw 'url can not be null!';
                 }
                 $container.html('');
-                plugin.$container.data('weatherProject', plugin);
+                plugin.$container.data('logProject', plugin);
 
             });
         },
 
-        participationProject : function(options) {
+        showLogList : function(options) {
 
             if (this && this.length > 1) {
                 throw 'Container Element Must Be Unique!';
@@ -114,8 +119,8 @@
                     throw 'url can not be null!';
                 }
                 $container.html('');
-                _loadParticipationProjectData($container, plugin.myProjects,ajaxOption);
-                plugin.$container.data('weatherProject', plugin);
+                _loadLogProjectData($container, plugin.myProjects,ajaxOption);
+                plugin.$container.data('logProject', plugin);
 
             });
         },
@@ -124,13 +129,13 @@
         destroy : function(options) {
             return $(this).each(function() {
                 var $this = $(this);
-                $this.removeData('weatherProject');
+                $this.removeData('logProject');
             });
         }
     };
 
 
-    $.fn.MyWeatherProject = function(option) {
+    $.fn.MyProject = function(option) {
 
         var method = arguments[0];
 
@@ -141,7 +146,7 @@
             method = methods.init;
         } else {
             $.error('Method ' + method
-                + ' does not exist on jQuery.weatherProject');
+                + ' does not exist on jQuery.logProject');
             return this;
         }
 
@@ -149,3 +154,4 @@
 
     };
 })(jQuery, window, document);
+

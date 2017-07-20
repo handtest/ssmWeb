@@ -2,10 +2,12 @@ package com.hand.controller;
 
 import com.hand.entity.User;
 import com.hand.service.UserService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
@@ -17,7 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by Administrator on 2017/7/6.
+ * Created by hanlu on 2017/7/6.
  */
 @Controller
 public class UserController {
@@ -33,7 +35,8 @@ public class UserController {
     * */
     @Transactional
     @RequestMapping("/showUser")
-    public String getUserList(HttpServletRequest request, Model model){
+    public String getUserList(HttpServletRequest request, HttpSession session, Model model){
+        logger.info(session.getAttribute("username")+"查询了用户列表");
         try {
             List<User> userList = userService.listUser();
             model.addAttribute("userList",userList);
@@ -49,7 +52,7 @@ public class UserController {
     * return
     * */
     @Transactional
-    @RequestMapping("/save")
+    @RequestMapping(value = "/save", method = RequestMethod.POST)
     public void save(HttpServletRequest request, HttpServletResponse response) {
         try {
             String name = request.getParameter("userName");
@@ -79,7 +82,7 @@ public class UserController {
     * */
     @Transactional
     @RequestMapping("/edit")
-    public void getUser(HttpServletRequest request, HttpServletResponse response, Model model){
+    public void updateUser(HttpServletRequest request, HttpServletResponse response, Model model){
         try {
             String name = request.getParameter("userName");
             int age = Integer.parseInt(request.getParameter("age"));
@@ -122,26 +125,46 @@ public class UserController {
         }
     }
 
-    @RequestMapping("/login")
-    public String login(HttpServletRequest request, HttpServletResponse response, Model model){
+    /*
+    * 登录验证
+    * param userName
+    * param checkCode
+    * return
+    * */
+    @RequestMapping(value = "/login",method = RequestMethod.POST)
+    public String login(HttpServletRequest request, HttpServletResponse response,
+                        Model model, @Param("name") String name,
+                        @Param("checkCode")String checkCode){
         if (!checkVerification(request,response)){
             model.addAttribute("msg","验证码错误！");
             return "index";
         }
-        String name = request.getParameter("userName");
         if (name!=null && name != ""){
             User user = userService.checkLogin(name);
-            if (user != null) {
-                request.getSession().setAttribute("username",name);
+            if (user != null && !"admin".equals(user.getUserName())) {
+                HttpSession session = request.getSession();
+                Integer id = user.getId();
+                session.setAttribute("name",name);
+                session.setAttribute("id",id);
                 List<User> userList = userService.listUser();
                 model.addAttribute("userList",userList);
-                return "showUser";
+                return "page";
+            }
+            if (user.getUserName().equals("admin")) {
+                HttpSession session = request.getSession();
+                Integer id = user.getId();
+                session.setAttribute("name",name);
+                session.setAttribute("id",id);
+                return "showLog";
             }
         }
         model.addAttribute("msg","找不到用户！");
         return "index";
     }
 
+    /*
+    * 验证码验证
+    * */
     public boolean checkVerification(HttpServletRequest request, HttpServletResponse response){
         HttpSession session = request.getSession();
         String sessionCode = (String)session.getAttribute("randCheckCode");

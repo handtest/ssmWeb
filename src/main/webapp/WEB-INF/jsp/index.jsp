@@ -2,9 +2,9 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/bootstrap.min.css">
+    <script src="<%=request.getContextPath()%>/js/jquery-3.2.1.min.js"></script>
+    <script src="<%=request.getContextPath()%>/js/bootstrap.min.js"></script>
     <style>
         .col-sm-10 {width: 40%;}
     </style>
@@ -27,7 +27,7 @@
         <div class="form-group">
             <label for="firstname" class="col-sm-2 control-label">名字</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="firstname" name="userName"
+                <input type="text" class="form-control" id="firstname" name="name"
                        placeholder="请输入名字">
             </div>
         </div>

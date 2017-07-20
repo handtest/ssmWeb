@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="pagehelper-5.0.3-beta">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/pagehelper-5.0.3-beta.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
